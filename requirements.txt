@@ -1,0 +1,37 @@
+# Core ML / Data
+pandas
+numpy
+scikit-learn
+scipy
+
+# Data pipeline
+polars
+
+# Data validation
+great_expectations
+
+# Experiment tracking
+mlflow
+
+# Data versioning
+dvc
+
+# Data formats
+pyarrow
+
+# Data sourcing
+kagglehub[polars-datasets]
+
+# API + UI
+fastapi
+uvicorn
+streamlit
+requests
+
+# Config / env
+python-dotenv
+pyyaml
+
+# Logging
+loguru
+
