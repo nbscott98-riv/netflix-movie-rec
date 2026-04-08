@@ -1,0 +1,25 @@
+stages:
+  validate:
+    cmd: python data_validation/validate_schema.py
+    deps:
+    - data/transformed/t_netflix.parquet
+    - data/transformed/t_rotten_tomatoes_review.parquet
+    - data/transformed/t_rotten_tomatoes_summary.parquet
+    - data_validation/validate_schema.py
+  ingest:
+    cmd: python data_ingestion/ingest.py
+    deps:
+    - data_ingestion/ingest.py
+    outs:
+    - data/processed
+  transform:
+    cmd: python data_cleaning/clean_data.py
+    deps:
+    - data/processed/netflix.parquet
+    - data/processed/rotten_tomatoes_review.parquet
+    - data/processed/rotten_tomatoes_summary.parquet
+    - data_cleaning/clean_data.py
+    outs:
+    - data/transformed/t_netflix.parquet
+    - data/transformed/t_rotten_tomatoes_review.parquet
+    - data/transformed/t_rotten_tomatoes_summary.parquet

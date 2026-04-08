@@ -1,5 +1,0 @@
-outs:
-- md5: 1c949974ff68d17d08f9f900ec8fa1bd
-  size: 10749213
-  hash: md5
-  path: t_rotten_tomatoes_summary.parquet

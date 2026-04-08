@@ -1,0 +1,66 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: python data_ingestion/ingest.py
+    deps:
+    - path: data_ingestion/ingest.py
+      hash: md5
+      md5: a3a399451b57ae6e5c3ff110ff1fb422
+      size: 2148
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: c45459915a75f0e13ded3b0ad92e45a1.dir
+      size: 62241457
+      nfiles: 3
+  transform:
+    cmd: python data_cleaning/clean_data.py
+    deps:
+    - path: data/processed/netflix.parquet
+      hash: md5
+      md5: 688a54ee30931d797867b6a7c4f9b5a1
+      size: 1116808
+    - path: data/processed/rotten_tomatoes_review.parquet
+      hash: md5
+      md5: 638e65029337b698904fd343c5a16b8f
+      size: 54631182
+    - path: data/processed/rotten_tomatoes_summary.parquet
+      hash: md5
+      md5: 01149ece035f86a70b0453243ae2a5ae
+      size: 6493467
+    - path: data_cleaning/clean_data.py
+      hash: md5
+      md5: 9fd55c551a195938c6d356738c1e2e77
+      size: 3902
+    outs:
+    - path: data/transformed/t_netflix.parquet
+      hash: md5
+      md5: a773615093043d04c96cb530fb4658ce
+      size: 1955837
+    - path: data/transformed/t_rotten_tomatoes_review.parquet
+      hash: md5
+      md5: 004c4ad1122186eaddfefbe3c116e9fd
+      size: 1849367
+    - path: data/transformed/t_rotten_tomatoes_summary.parquet
+      hash: md5
+      md5: 1c949974ff68d17d08f9f900ec8fa1bd
+      size: 10749213
+  validate:
+    cmd: python data_validation/validate_schema.py
+    deps:
+    - path: data/transformed/t_netflix.parquet
+      hash: md5
+      md5: a773615093043d04c96cb530fb4658ce
+      size: 1955837
+    - path: data/transformed/t_rotten_tomatoes_review.parquet
+      hash: md5
+      md5: 004c4ad1122186eaddfefbe3c116e9fd
+      size: 1849367
+    - path: data/transformed/t_rotten_tomatoes_summary.parquet
+      hash: md5
+      md5: 1c949974ff68d17d08f9f900ec8fa1bd
+      size: 10749213
+    - path: data_validation/validate_schema.py
+      hash: md5
+      md5: 6c4e39cc517f9ead35910a71397bc0ae
+      size: 2067
