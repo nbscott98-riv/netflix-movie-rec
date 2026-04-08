@@ -1,0 +1,5 @@
+outs:
+- md5: a773615093043d04c96cb530fb4658ce
+  size: 1955837
+  hash: md5
+  path: t_netflix.parquet
