@@ -2,6 +2,7 @@ import pandas as pd
 import unicodedata
 
 from pathlib import Path
+from data_validation.validate_schema import validate_dataset
 
 TRANSFORMED_DIR = Path("data/transformed")
 TRANSFORMED_DIR.mkdir(parents=True, exist_ok=True)
@@ -73,6 +74,73 @@ cleaned_data_nt.head()
 after_rows = len(cleaned_data_nt)
 
 
+print(cleaned_data_nt.head())
+
+print(f"Rows before cleaning: {before_rows}")
+print(f"Rows after cleaning:  {after_rows}")
+print(f"Rows removed:         {before_rows - after_rows}")
+
+# Call validation
+
+validate_dataset(
+    cleaned_data=cleaned_data_nt,
+    dataset_name="Netflix",
+    required_columns=[
+        "show_id",
+        "title",
+        "release_year",
+        "date_added",
+    ],
+    type_expectations={
+        "show_id": "object",
+        "title": "object",
+        "release_year": "int64",
+        "date_added": "datetime64[ns]",
+    },
+    critical_columns=[
+        "show_id",
+        "title",
+    ],
+)
+
+
+validate_dataset(
+    cleaned_data=cleaned_data_rt_s,
+    dataset_name="Rotten Tomatoes Summary",
+    required_columns=[
+        "rotten_tomatoes_link",
+        "movie_title",
+        "runtime",
+        "actors",
+    ],
+    type_expectations={
+        "rotten_tomatoes_link": "object",
+        "movie_title": "object",
+        "runtime": "float64",
+        "actors": "object",
+    },
+    critical_columns=[
+        "rotten_tomatoes_link",
+    ],
+)
+
+validate_dataset(
+    cleaned_data=cleaned_data_rt_r,
+    dataset_name="Rotten Tomatoes Reviews",
+    required_columns=[
+        "rotten_tomatoes_link",
+        "critic_name",
+    ],
+    type_expectations={
+        "rotten_tomatoes_link": "object",
+        "critic_name": "object",
+    },
+    critical_columns=[
+        "rotten_tomatoes_link",
+    ],
+)
+
+
 # Save transformed datasets
 cleaned_data_nt.to_parquet(
     TRANSFORMED_DIR / "t_netflix.parquet",
@@ -88,9 +156,3 @@ cleaned_data_rt_r.to_parquet(
     TRANSFORMED_DIR / "t_rotten_tomatoes_review.parquet",
     index=False
 )
-
-print(cleaned_data_nt.head())
-
-print(f"Rows before cleaning: {before_rows}")
-print(f"Rows after cleaning:  {after_rows}")
-print(f"Rows removed:         {before_rows - after_rows}")

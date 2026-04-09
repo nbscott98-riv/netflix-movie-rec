@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   ingest:
-    cmd: python data_ingestion/ingest.py
+    cmd: python -m data_ingestion.ingest
     deps:
     - path: data_ingestion/ingest.py
       hash: md5
@@ -14,7 +14,7 @@ stages:
       size: 62241457
       nfiles: 3
   transform:
-    cmd: python data_cleaning/clean_data.py
+    cmd: python -m data_cleaning.clean_data
     deps:
     - path: data/processed/netflix.parquet
       hash: md5
@@ -30,8 +30,12 @@ stages:
       size: 6493467
     - path: data_cleaning/clean_data.py
       hash: md5
-      md5: 9fd55c551a195938c6d356738c1e2e77
-      size: 3902
+      md5: d3bfdb31f5a783fb3ca197fbbf691388
+      size: 5208
+    - path: data_validation/validate_schema.py
+      hash: md5
+      md5: cb1e06be9ac7d6a1e8be3c613ca37341
+      size: 3046
     outs:
     - path: data/transformed/t_netflix.parquet
       hash: md5

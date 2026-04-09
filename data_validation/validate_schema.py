@@ -1,83 +1,100 @@
+
 import great_expectations as gx
-import polars as pl
+from great_expectations.expectations import (
+    ExpectColumnToExist,
+    ExpectColumnValuesToBeOfType,
+    ExpectColumnValuesToNotBeNull,
+)
 
-context = gx.get_context()
 
+def validate_dataset(
+    cleaned_data,
+    dataset_name,
+    required_columns,
+    type_expectations,
+    critical_columns,
+):
+    """
+    Generic Great Expectations validation for cleaned datasets.
+    Raises an exception if validation fails.
+    """
 
-def validate_dataset(df_pd, suite_name, required_columns, critical_columns):
-    # Create datasource
-    try:
-        data_source = context.data_sources.get("pandas")
-    except Exception:
-        data_source = context.data_sources.add_pandas("pandas")
-    data_asset = data_source.add_dataframe_asset(name=suite_name)
+    # --------------------------------------------------
+    # Create Data Context
+    # --------------------------------------------------
+    context = gx.get_context()
 
-    batch_definition = data_asset.add_batch_definition_whole_dataframe("batch")
-    batch = batch_definition.get_batch(
-        batch_parameters={"dataframe": df_pd}
+    # --------------------------------------------------
+    # Create Data Source, Data Asset, Batch Definition, and Batch
+    # --------------------------------------------------
+    data_source = context.data_sources.add_pandas("pandas")
+
+    data_asset = data_source.add_dataframe_asset(
+        name=f"{dataset_name} cleaned data"
     )
 
-    # Create suite
-    suite = gx.ExpectationSuite(name=suite_name)
-    suite = context.suites.add(suite)
+    batch_definition = data_asset.add_batch_definition_whole_dataframe(
+        "batch definition"
+    )
 
-    # Column existence
+    batch = batch_definition.get_batch(
+        batch_parameters={"dataframe": cleaned_data}
+    )
+
+    # --------------------------------------------------
+    # Create Expectation Suite
+    # --------------------------------------------------
+    suite = gx.ExpectationSuite(
+        name=f"{dataset_name} expectations"
+    )
+
+    # --------------------------------------------------
+    # Column Existence Validation
+    # --------------------------------------------------
     for col in required_columns:
         suite.add_expectation(
-            gx.expectations.ExpectColumnToExist(column=col)
+            ExpectColumnToExist(column=col)
         )
 
-    # Null checks (only critical)
+    # --------------------------------------------------
+    # Data Type Validation
+    # --------------------------------------------------
+    for col, dtype in type_expectations.items():
+        suite.add_expectation(
+            ExpectColumnValuesToBeOfType(
+                column=col,
+                type_=dtype
+            )
+        )
+
+    # --------------------------------------------------
+    # Null Value Validation (Critical Columns)
+    # --------------------------------------------------
     for col in critical_columns:
         suite.add_expectation(
-            gx.expectations.ExpectColumnValuesToNotBeNull(column=col)
+            ExpectColumnValuesToNotBeNull(column=col)
         )
 
-    # Validate
+    # --------------------------------------------------
+    # Add the Expectation Suite to the Data Context
+    # --------------------------------------------------
+    suite = context.suites.add(suite)
+
+    # --------------------------------------------------
+    # Execute Validation
+    # --------------------------------------------------
     results = batch.validate(suite)
-    print(f"{suite_name} validation success:", results.success)
 
-    return results.success
+    print(
+        f"{dataset_name} validation success:",
+        results.success
+    )
 
-netflix_df = pl.read_parquet("data/transformed/t_netflix.parquet").to_pandas()
-
-validate_dataset(
-    netflix_df,
-    "netflix_suite",
-    required_columns=[
-        "show_id", "title", "release_year", "date_added"
-    ],
-    critical_columns=[
-        "show_id", "title"
-    ]
-)
-
-reviews_df = pl.read_parquet(
-    "data/transformed/t_rotten_tomatoes_review.parquet"
-).to_pandas()
-
-validate_dataset(
-    reviews_df,
-    "rotten_reviews_suite",
-    required_columns=[
-        "rotten_tomatoes_link", "critic_name"
-    ],
-    critical_columns=[
-       "rotten_tomatoes_link"
-    ]
-)
-
-summary_df = pl.read_parquet(
-    "data/transformed/t_rotten_tomatoes_summary.parquet"
-).to_pandas()
-
-validate_dataset(
-    summary_df,
-    "rotten_summary_suite",
-    required_columns=[
-        "rotten_tomatoes_link", "movie_title", "runtime", "actors"
-    ],
-    critical_columns=[
-        "rotten_tomatoes_link"
-    ]
-)
+    # --------------------------------------------------
+    # HARD GATE — Stop Pipeline on Failure
+    # --------------------------------------------------
+    if not results.success:
+        print(results)
+        raise ValueError(
+            f"{dataset_name} failed validation."
+        )
