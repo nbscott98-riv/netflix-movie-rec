@@ -1,3 +1,4 @@
 /t_netflix.parquet
 /t_rotten_tomatoes_summary.parquet
 /t_rotten_tomatoes_review.parquet
+/t_movie_features.parquet

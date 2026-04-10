@@ -5,14 +5,14 @@ stages:
     deps:
     - path: data_ingestion/ingest.py
       hash: md5
-      md5: a3a399451b57ae6e5c3ff110ff1fb422
-      size: 2148
+      md5: e27145e64644d63b1f58b09ae1c60e8c
+      size: 1650
     outs:
     - path: data/processed
       hash: md5
-      md5: c45459915a75f0e13ded3b0ad92e45a1.dir
-      size: 62241457
-      nfiles: 3
+      md5: 14e69f9ea4965f917e48d390aa3a0c27.dir
+      size: 7610275
+      nfiles: 2
   transform:
     cmd: python -m data_cleaning.clean_data
     deps:
@@ -20,18 +20,14 @@ stages:
       hash: md5
       md5: 688a54ee30931d797867b6a7c4f9b5a1
       size: 1116808
-    - path: data/processed/rotten_tomatoes_review.parquet
-      hash: md5
-      md5: 638e65029337b698904fd343c5a16b8f
-      size: 54631182
     - path: data/processed/rotten_tomatoes_summary.parquet
       hash: md5
       md5: 01149ece035f86a70b0453243ae2a5ae
       size: 6493467
     - path: data_cleaning/clean_data.py
       hash: md5
-      md5: d3bfdb31f5a783fb3ca197fbbf691388
-      size: 5208
+      md5: faacaa30d938b0d3752256dddb294715
+      size: 4475
     - path: data_validation/validate_schema.py
       hash: md5
       md5: cb1e06be9ac7d6a1e8be3c613ca37341
@@ -41,10 +37,6 @@ stages:
       hash: md5
       md5: a773615093043d04c96cb530fb4658ce
       size: 1955837
-    - path: data/transformed/t_rotten_tomatoes_review.parquet
-      hash: md5
-      md5: 004c4ad1122186eaddfefbe3c116e9fd
-      size: 1849367
     - path: data/transformed/t_rotten_tomatoes_summary.parquet
       hash: md5
       md5: 1c949974ff68d17d08f9f900ec8fa1bd
@@ -68,3 +60,43 @@ stages:
       hash: md5
       md5: 6c4e39cc517f9ead35910a71397bc0ae
       size: 2067
+  model unify:
+    cmd: python -m data_modeling.build_modeling_dataset
+    deps:
+    - path: data/transformed/t_netflix.parquet
+      hash: md5
+      md5: a773615093043d04c96cb530fb4658ce
+      size: 1955837
+    - path: data/transformed/t_rotten_tomatoes_summary.parquet
+      hash: md5
+      md5: 1c949974ff68d17d08f9f900ec8fa1bd
+      size: 10749213
+    - path: data_modeling/build_modeling_dataset.py
+      hash: md5
+      md5: d6335451d6913e31b1827919a97672c8
+      size: 2332
+    outs:
+    - path: data/modeling/movie_features.parquet
+      hash: md5
+      md5: c487e8793525754772a91332cd487ab7
+      size: 1416935
+  model transform:
+    cmd: python -m data_cleaning.clean_model
+    deps:
+    - path: data/modeling/movie_features.parquet
+      hash: md5
+      md5: c487e8793525754772a91332cd487ab7
+      size: 1416935
+    - path: data_cleaning/clean_model.py
+      hash: md5
+      md5: e36e1de9658376a1c538ea568704776e
+      size: 1703
+    - path: data_validation/validate_schema.py
+      hash: md5
+      md5: cb1e06be9ac7d6a1e8be3c613ca37341
+      size: 3046
+    outs:
+    - path: data/transformed/t_movie_features.parquet
+      hash: md5
+      md5: 088aba1bdf180d5a8974c81000a0ba6e
+      size: 992271

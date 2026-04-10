@@ -12,9 +12,24 @@ stages:
       - data_validation/validate_schema.py
       - data/processed/netflix.parquet
       - data/processed/rotten_tomatoes_summary.parquet
-      - data/processed/rotten_tomatoes_review.parquet
     outs:
       - data/transformed/t_netflix.parquet
       - data/transformed/t_rotten_tomatoes_summary.parquet
-      - data/transformed/t_rotten_tomatoes_review.parquet
+  model unify:
+    cmd: python -m data_modeling.build_modeling_dataset
+    deps:
+      - data_modeling/build_modeling_dataset.py
+      - data/transformed/t_netflix.parquet
+      - data/transformed/t_rotten_tomatoes_summary.parquet
+    outs:
+      - data/modeling/movie_features.parquet
+  model transform:
+    cmd: python -m data_cleaning.clean_model
+    deps:
+      - data_cleaning/clean_model.py
+      - data_validation/validate_schema.py
+      - data/modeling/movie_features.parquet
+    outs:
+      - data/transformed/t_movie_features.parquet
+
 

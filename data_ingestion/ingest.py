@@ -62,17 +62,3 @@ if __name__ == "__main__":
     save_data(rotten_s_df, "rotten_tomatoes_summary")
 
     print(rotten_s_df.head())
-
-        # ----------------------------
-    # Rotten Tomatoes individual review data set
-    # ----------------------------
-    print("\nLoading Rotten Tomatoes critics data...")
-    rotten_c_df = load_from_kaggle(
-        dataset="stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset",
-        file_path="rotten_tomatoes_critic_reviews.csv"
-    )
-
-    print("Saving Rotten Tomatoes critics data...")
-    save_data(rotten_c_df, "rotten_tomatoes_review")
-
-    print(rotten_c_df.head())

@@ -1,0 +1,1 @@
+mlflow.log_metric("f1_score", f1)

@@ -10,7 +10,6 @@ TRANSFORMED_DIR.mkdir(parents=True, exist_ok=True)
 #Call stored data
 cleaned_data_nt = pd.read_parquet("data/processed/netflix.parquet")
 cleaned_data_rt_s = pd.read_parquet("data/processed/rotten_tomatoes_summary.parquet")
-cleaned_data_rt_r = pd.read_parquet("data/processed/rotten_tomatoes_review.parquet")
 before_rows = len(cleaned_data_nt)
 
 
@@ -21,14 +20,10 @@ cleaned_data_nt = cleaned_data_nt.dropna(
 cleaned_data_rt_s = cleaned_data_rt_s.dropna(
     subset=['rotten_tomatoes_link', 'movie_title', 'runtime', 'actors']
 )
-cleaned_data_rt_r = cleaned_data_rt_r.dropna(
-    subset=['rotten_tomatoes_link', 'critic_name']
-)
 
 # Remove duplicate rows
 cleaned_data_nt = cleaned_data_nt.drop_duplicates(subset=['show_id'])
 cleaned_data_rt_s = cleaned_data_rt_s.drop_duplicates(subset=['rotten_tomatoes_link'])
-cleaned_data_rt_r = cleaned_data_rt_r.drop_duplicates(subset=['rotten_tomatoes_link'])
 
 # Remove any inconsistent data types
 for col in ['release_year']:
@@ -124,23 +119,6 @@ validate_dataset(
     ],
 )
 
-validate_dataset(
-    cleaned_data=cleaned_data_rt_r,
-    dataset_name="Rotten Tomatoes Reviews",
-    required_columns=[
-        "rotten_tomatoes_link",
-        "critic_name",
-    ],
-    type_expectations={
-        "rotten_tomatoes_link": "object",
-        "critic_name": "object",
-    },
-    critical_columns=[
-        "rotten_tomatoes_link",
-    ],
-)
-
-
 # Save transformed datasets
 cleaned_data_nt.to_parquet(
     TRANSFORMED_DIR / "t_netflix.parquet",
@@ -149,10 +127,5 @@ cleaned_data_nt.to_parquet(
 
 cleaned_data_rt_s.to_parquet(
     TRANSFORMED_DIR / "t_rotten_tomatoes_summary.parquet",
-    index=False
-)
-
-cleaned_data_rt_r.to_parquet(
-    TRANSFORMED_DIR / "t_rotten_tomatoes_review.parquet",
     index=False
 )
