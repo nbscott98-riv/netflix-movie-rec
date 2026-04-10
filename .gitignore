@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# MLflow
+mlruns/
+mlflow.db
+
+# Temporary / evaluation artifacts
+tmp_eval_artifacts/
+
+# OS / editor junk
+.DS_Store
+.vscode/
+
+# Data
+data/**/*.parquet
+data/**/*.csv
+
+# Models
+models/**
+!models/README.md
+!models/artifacts/*.dvc
