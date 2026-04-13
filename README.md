@@ -12,6 +12,6 @@ Katherine Lonergan
 
 ## Installation & Setup
 </> Bash
-git clone https://github.com/your-chaRadhi1992/netflix-movie-recommendation system.git
+git clone https://github.com/your-nbscott98-riv/netflix-movie-recommendation system.git
 cd netflix-movie-recommendation system
 pip install -r requirements.txt
