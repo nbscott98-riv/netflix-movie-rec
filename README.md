@@ -15,3 +15,6 @@ Katherine Lonergan
 git clone https://github.com/nbscott98-riv/netflix-movie-rec.git
 cd netflix-movie-recommendation system
 pip install -r requirements.txt
+
+</> Bash
+Python main.py
