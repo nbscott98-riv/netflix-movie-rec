@@ -56,7 +56,7 @@ with mlflow.start_run(run_name="tfidf-eval"):
     mlflow.log_param("num_movies", len(titles))
     mlflow.log_param(
         "text_fields",
-        "title,description,cast,actors,listed_in"
+        "title,description,cast,actors,listed_in,movie_info,critics_consensus,content_rating,directors"
     )
 
     # Evaluation 1: sanity checks
@@ -89,16 +89,16 @@ with mlflow.start_run(run_name="tfidf-eval"):
     mlflow.log_metric("p95_similarity", p95_sim)
 
     # Evaluation 3: genre overlap proxy
-    #genre_scores = []
-    #for idx in sample_indices:
-    #    base_genres = df["listed_in"][idx]
-    #    for title, _ in find_similar(idx):
-    #        sim_idx = titles.index(title)
-    #        sim_genres = df["listed_in"][sim_idx]
-    #        genre_scores.append(jaccard(base_genres, sim_genres))
+    genre_scores = []
+    for idx in sample_indices:
+        base_genres = rows_df["listed_in"][int(idx)]
+        for title, _ in find_similar(idx):
+            sim_idx = titles.index(title)
+            sim_genres = rows_df["listed_in"][int(sim_idx)]
+            genre_scores.append(jaccard(base_genres, sim_genres))
 
     #if genre_scores:
-    #    avg_overlap = float(np.mean(genre_scores))
-    #    mlflow.log_metric("avg_genre_overlap", avg_overlap)
+        avg_overlap = float(np.mean(genre_scores))
+        mlflow.log_metric("avg_genre_overlap", avg_overlap)
 
 print("Evaluation logged to MLflow")

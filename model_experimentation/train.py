@@ -23,13 +23,17 @@ df = df.with_columns(
         + pl.col("description").fill_null("") + " "
         + pl.col("type").fill_null("") + " "
         + pl.col("actors").fill_null("")
+        + pl.col("movie_info").fill_null("") + " "
+        + pl.col("critics_consensus").fill_null("") + " "
+        + pl.col("content_rating").fill_null("") + " "
+        + pl.col("directors").fill_null("")
     ).alias("text_features")
 )
 
 pdf = df.to_pandas()
 
 # After building the final df used for TF-IDF
-final_df = df.select(["movie_id", "title", "text_features"])
+final_df = df.select(["movie_id", "title", "listed_in","text_features"])
 
 # Save aligned metadata
 final_df.write_parquet("models/artifacts/tfidf_rows.parquet")
