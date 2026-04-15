@@ -26,12 +26,12 @@ stages:
       size: 6493467
     - path: data_cleaning/clean_data.py
       hash: md5
-      md5: faacaa30d938b0d3752256dddb294715
-      size: 4475
+      md5: cbaf039728077a5a2e6e4e92001ba38f
+      size: 5610
     - path: data_validation/validate_schema.py
       hash: md5
-      md5: cb1e06be9ac7d6a1e8be3c613ca37341
-      size: 3046
+      md5: 5a8e6a04fdfec7a2428f349a3c682dea
+      size: 2002
     outs:
     - path: data/transformed/t_netflix.parquet
       hash: md5
@@ -39,8 +39,8 @@ stages:
       size: 1955837
     - path: data/transformed/t_rotten_tomatoes_summary.parquet
       hash: md5
-      md5: 1c949974ff68d17d08f9f900ec8fa1bd
-      size: 10749213
+      md5: daa1a9905f858bf564ecf218e6a4d58d
+      size: 6061659
   validate:
     cmd: python data_validation/validate_schema.py
     deps:
@@ -69,34 +69,34 @@ stages:
       size: 1955837
     - path: data/transformed/t_rotten_tomatoes_summary.parquet
       hash: md5
-      md5: 1c949974ff68d17d08f9f900ec8fa1bd
-      size: 10749213
+      md5: daa1a9905f858bf564ecf218e6a4d58d
+      size: 6061659
     - path: data_modeling/build_modeling_dataset.py
       hash: md5
-      md5: d6335451d6913e31b1827919a97672c8
-      size: 2332
+      md5: 639b362a99cf992fbf454d584512b11c
+      size: 2568
     outs:
     - path: data/modeling/movie_features.parquet
       hash: md5
-      md5: c487e8793525754772a91332cd487ab7
-      size: 1416935
+      md5: 112b516164140c162f55b3778287d1c5
+      size: 1448156
   model transform:
     cmd: python -m data_cleaning.clean_model
     deps:
     - path: data/modeling/movie_features.parquet
       hash: md5
-      md5: c487e8793525754772a91332cd487ab7
-      size: 1416935
+      md5: 112b516164140c162f55b3778287d1c5
+      size: 1448156
     - path: data_cleaning/clean_model.py
       hash: md5
-      md5: e36e1de9658376a1c538ea568704776e
-      size: 1703
+      md5: cabc11b21575868f5eccd1074dab463f
+      size: 1827
     - path: data_validation/validate_schema.py
       hash: md5
-      md5: cb1e06be9ac7d6a1e8be3c613ca37341
-      size: 3046
+      md5: 5a8e6a04fdfec7a2428f349a3c682dea
+      size: 2002
     outs:
     - path: data/transformed/t_movie_features.parquet
       hash: md5
-      md5: 088aba1bdf180d5a8974c81000a0ba6e
-      size: 992271
+      md5: 1447e364dcdec6f5fef2dab2c498e4bf
+      size: 1024556

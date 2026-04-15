@@ -73,6 +73,10 @@ rt_summary_model = rt_summary.select(
         "normalized_title",
         "runtime",
         "actors",
+        "movie_info",
+        "critics_consensus",
+        "content_rating",
+        "directors",
     ]
 )
 
@@ -95,6 +99,9 @@ movies = movies.with_columns(
         pl.col("cast").fill_null(""),
         pl.col("actors").fill_null(""),
         pl.col("listed_in").fill_null(""),
+        pl.col("movie_info").fill_null(""),
+        pl.col("critics_consensus").fill_null(""),
+        pl.col("directors").fill_null(""),
     ]
 )
 

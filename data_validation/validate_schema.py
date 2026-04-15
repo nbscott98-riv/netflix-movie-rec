@@ -1,4 +1,3 @@
-
 import great_expectations as gx
 from great_expectations.expectations import (
     ExpectColumnToExist,
@@ -19,46 +18,33 @@ def validate_dataset(
     Raises an exception if validation fails.
     """
 
-    # --------------------------------------------------
     # Create Data Context
-    # --------------------------------------------------
     context = gx.get_context()
 
-    # --------------------------------------------------
     # Create Data Source, Data Asset, Batch Definition, and Batch
-    # --------------------------------------------------
     data_source = context.data_sources.add_pandas("pandas")
-
     data_asset = data_source.add_dataframe_asset(
         name=f"{dataset_name} cleaned data"
     )
-
     batch_definition = data_asset.add_batch_definition_whole_dataframe(
         "batch definition"
     )
-
     batch = batch_definition.get_batch(
         batch_parameters={"dataframe": cleaned_data}
     )
 
-    # --------------------------------------------------
     # Create Expectation Suite
-    # --------------------------------------------------
     suite = gx.ExpectationSuite(
         name=f"{dataset_name} expectations"
     )
 
-    # --------------------------------------------------
     # Column Existence Validation
-    # --------------------------------------------------
     for col in required_columns:
         suite.add_expectation(
             ExpectColumnToExist(column=col)
         )
 
-    # --------------------------------------------------
     # Data Type Validation
-    # --------------------------------------------------
     for col, dtype in type_expectations.items():
         suite.add_expectation(
             ExpectColumnValuesToBeOfType(
@@ -67,22 +53,16 @@ def validate_dataset(
             )
         )
 
-    # --------------------------------------------------
     # Null Value Validation (Critical Columns)
-    # --------------------------------------------------
     for col in critical_columns:
         suite.add_expectation(
             ExpectColumnValuesToNotBeNull(column=col)
         )
 
-    # --------------------------------------------------
     # Add the Expectation Suite to the Data Context
-    # --------------------------------------------------
     suite = context.suites.add(suite)
 
-    # --------------------------------------------------
     # Execute Validation
-    # --------------------------------------------------
     results = batch.validate(suite)
 
     print(
@@ -90,9 +70,7 @@ def validate_dataset(
         results.success
     )
 
-    # --------------------------------------------------
-    # HARD GATE — Stop Pipeline on Failure
-    # --------------------------------------------------
+    # Stop Pipeline on Failure
     if not results.success:
         print(results)
         raise ValueError(

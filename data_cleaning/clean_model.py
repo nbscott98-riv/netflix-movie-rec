@@ -53,7 +53,11 @@ validate_dataset(
         "listed_in": "object",
         "release_year": "int64",
         "type": "object",
-        "runtime": "float64",  # if present
+        "runtime": "float64",
+        "movie_info": "object",
+        "critics_consensus": "object",
+        "content_rating": "object",
+        "directors": "object",
     },
     critical_columns=[
         "title",
