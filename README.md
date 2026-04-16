@@ -31,14 +31,14 @@ Katherine Lonergan
 
 ## Installation & Setup
 </> Bash
-1. Clone the existing repository
-    git clone https://github.com/nbscott98-riv/netflix-movie-rec.git
-    cd netflix-movie-recommendation system
-    pip install -r requirements.txt
+1. Clone the existing repository. 
+    `git clone https://github.com/nbscott98-riv/netflix-movie-rec.git`. 
+    `cd netflix-movie-recommendation system`  
+    `pip install -r requirements.txt`  
 2. Install dependencies from the terminal
-    pip install -r requirements.txt
+    `pip install -r requirements.txt`  
 3. Run the streamlit app from the terminal
-    streamlit run app.py
+    `streamlit run app.py`  
 4. In your browser, navigate to: http://localhost:8501
 
 ## Future Improvements
