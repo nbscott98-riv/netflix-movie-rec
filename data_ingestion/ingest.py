@@ -35,9 +35,8 @@ def save_data(df: pl.DataFrame, name: str) -> None:
 
 
 if __name__ == "__main__":
-    # ----------------------------
+ 
     # Netflix dataset
-    # ----------------------------
     print("Loading Netflix data...")
     netflix_df = load_from_kaggle(
         dataset="shivamb/netflix-shows",

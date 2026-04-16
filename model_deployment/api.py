@@ -3,15 +3,16 @@ from fastapi import FastAPI
 import polars as pl
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
+from pathlib import Path
 
 app = FastAPI(title="Movie Recommendation API")
 
 TOP_K = 5
 
 # Load artifacts once at startup
-rows_df = pl.read_parquet("models/artifacts/tfidf_rows.parquet")
+rows_df = pl.read_parquet("/workspaces/netflix-movie-rec/models/artifacts/tfidf_rows.parquet")
 
-with open("models/artifacts/tfidf_matrix.pkl", "rb") as f:
+with open("/workspaces/netflix-movie-rec/models/artifacts/tfidf_matrix.pkl", "rb") as f:
     tfidf_matrix = pickle.load(f)
 
 titles = rows_df["title"].to_list()

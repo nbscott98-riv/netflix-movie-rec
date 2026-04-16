@@ -21,3 +21,7 @@ data/**/*.csv
 models/**
 !models/README.md
 !models/artifacts/*.dvc
+
+# Monitoring artifacts
+monitoring/*.parquet
+monitoring/*.html
