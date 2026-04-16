@@ -1,5 +1,5 @@
 # Netflix Movie Recommendation App 
-## Project Tea, 
+## Project Team 
 Group 9
 
 ## Project Description 
