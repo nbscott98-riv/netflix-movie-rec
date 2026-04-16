@@ -3,8 +3,11 @@ import pickle
 import polars as pl
 import numpy as np
 import mlflow
+import time
+from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
 from pathlib import Path
+from datetime import datetime
 
 # Config
 DATA_PATH = "data/modeling/movie_features.parquet"
@@ -32,13 +35,15 @@ assert tfidf_matrix.shape[0] == len(titles), \
 
 # Helper functions
 def find_similar(idx, k=TOP_K):
+    start = time.perf_counter()
     sims = cosine_similarity(
         tfidf_matrix[idx],
         tfidf_matrix
     ).flatten()
 
     top_idx = sims.argsort()[-(k + 1):][::-1][1:]
-    return [(titles[i], sims[i]) for i in top_idx]
+    latency_ms = (time.perf_counter() - start) * 1000
+    return [(titles[i], sims[i]) for i in top_idx], latency_ms
 
 def jaccard(a, b):
     a = set(a.split(", "))
@@ -48,7 +53,7 @@ def jaccard(a, b):
 # MLflow setup
 mlflow.set_experiment(EXPERIMENT_NAME)
 
-with mlflow.start_run(run_name="tfidf-eval"):
+with mlflow.start_run(run_name=f"tfidf-eval-v1_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"):
 
     # -------- params --------
     mlflow.log_param("model_type", "tfidf")
@@ -63,11 +68,15 @@ with mlflow.start_run(run_name="tfidf-eval"):
     sample_indices = np.random.choice(
         len(titles), size=5, replace=False
     )
-
+    latencies = []
     nn_lines = []
     for idx in sample_indices:
         nn_lines.append(f"\nMovie: {titles[idx]}")
-        for title, score in find_similar(idx):
+
+        results, latency = find_similar(idx)
+        latencies.append(latency)
+
+        for title, score in results:
             nn_lines.append(f"  → {title} (score={score:.3f})")
 
     nn_text = "\n".join(nn_lines)
@@ -77,8 +86,9 @@ with mlflow.start_run(run_name="tfidf-eval"):
     mlflow.log_artifact(nn_path)
 
     # Evaluation 2: similarity distribution
-    all_sims = cosine_similarity(tfidf_matrix, tfidf_matrix)
-    upper = all_sims[np.triu_indices_from(all_sims, k=1)]
+    all_sims = cosine_similarity(tfidf_matrix)
+    np.fill_diagonal(all_sims, np.nan)
+    upper = all_sims[~np.isnan(all_sims)]
 
     mean_sim = float(upper.mean())
     median_sim = float(np.median(upper))
@@ -90,15 +100,42 @@ with mlflow.start_run(run_name="tfidf-eval"):
 
     # Evaluation 3: genre overlap proxy
     genre_scores = []
+
     for idx in sample_indices:
         base_genres = rows_df["listed_in"][int(idx)]
-        for title, _ in find_similar(idx):
+
+        results, latency = find_similar(idx)
+        latencies.append(latency)
+
+        for title, _ in results:
             sim_idx = titles.index(title)
             sim_genres = rows_df["listed_in"][int(sim_idx)]
-            genre_scores.append(jaccard(base_genres, sim_genres))
+            genre_scores.append(
+                jaccard(base_genres, sim_genres)
+            )
 
-    #if genre_scores:
-        avg_overlap = float(np.mean(genre_scores))
-        mlflow.log_metric("avg_genre_overlap", avg_overlap)
+    avg_genre_overlap = float(np.mean(genre_scores))
+
+    avg_latency_ms = float(np.mean(latencies))
+    p95_latency_ms = float(np.percentile(latencies, 95))
+
+    mlflow.log_metric("avg_latency_ms", avg_latency_ms)
+    mlflow.log_metric("p95_latency_ms", p95_latency_ms)
+    mlflow.log_metric("avg_genre_overlap", avg_genre_overlap)
+    mlflow.log_param("eval_sample_size", len(sample_indices))
+
+
+MONITOR_DIR = Path("monitoring")
+MONITOR_DIR.mkdir(exist_ok=True)
+
+eval_df = pl.DataFrame({
+    "mean_similarity": [mean_sim],
+    "p95_similarity": [p95_sim],
+    "avg_genre_overlap": [avg_genre_overlap],
+    "avg_latency_ms": [avg_latency_ms],
+    "p95_latency_ms": [p95_latency_ms],
+})
+
+eval_df.write_parquet(MONITOR_DIR / "current_eval.parquet")
 
 print("Evaluation logged to MLflow")
