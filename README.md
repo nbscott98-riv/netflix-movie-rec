@@ -49,5 +49,4 @@ Katherine Lonergan
 - Included overall audience/critic score in output UI
 
 
-## License
-The MIT License (MIT) 2017. Please have a look at the LICENSE.md for more details.
+
